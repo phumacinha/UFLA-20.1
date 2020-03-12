@@ -1,2 +1,2 @@
-# Ufla-2020-1
-Trabalhos, provas e listas do 5º período de Ciência da Computação.
+# Ciência da Computação - UFLA
+Trabalhos, provas e listas da graduação em Ciência da Computação na Universidade Federal de Lavras.
