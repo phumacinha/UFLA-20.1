@@ -1,0 +1,14 @@
+:DECLARACOES
+n:INTEIRO
+fatorial:INTEIRO
+
+:ALGORITMO
+LER n
+ATRIBUIR n A fatorial
+SE n = 0 ENTAO ATRIBUIR 1 A fatorial
+ENQUANTO n > 1
+  INICIO
+    ATRIBUIR fatorial*(n-1) A fatorial
+    ATRIBUIR n-1 A n
+  FIM
+IMPRIMIR fatorial

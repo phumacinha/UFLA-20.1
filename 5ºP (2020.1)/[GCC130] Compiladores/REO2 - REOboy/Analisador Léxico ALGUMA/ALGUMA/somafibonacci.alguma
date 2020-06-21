@@ -1,0 +1,21 @@
+:DECLARACOES
+n:INTEIRO
+fibonacci:INTEIRO
+penultimo:INTEIRO
+soma:INTEIRO
+aux:INTEIRO
+
+:ALGORITMO
+LER n
+ATRIBUIR 1 A fibonacci
+ATRIBUIR 0 A penultimo
+ATRIBUIR 1 A soma
+ENQUANTO n > 0
+  INICIO
+    ATRIBUIR fibonacci A aux
+    ATRIBUIR fibonacci+penultimo A fibonacci
+    ATRIBUIR aux A penultimo
+    ATRIBUIR soma+fibonacci A soma
+    ATRIBUIR n-1 A n
+  FIM
+IMPRIMIR soma
