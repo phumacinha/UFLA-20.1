@@ -19,3 +19,4 @@ ENQUANTO n > 0
     ATRIBUIR n-1 A n
   FIM
 IMPRIMIR soma
+

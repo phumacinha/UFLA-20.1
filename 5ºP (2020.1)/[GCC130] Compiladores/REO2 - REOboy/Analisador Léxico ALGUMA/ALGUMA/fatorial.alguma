@@ -12,3 +12,4 @@ ENQUANTO n > 1
     ATRIBUIR n-1 A n
   FIM
 IMPRIMIR fatorial
+
