@@ -57,10 +57,11 @@ Str : \"(.*)\"
 <EXPR_BOOL_FP>
 <OP_BOOL>
 
+<BOOL_RETURN>
+
 <CONJUNTO_INSTRUCOES>
 <INSTRUCAO>
 
-<BOOL_RETURN>
 <LEITURA>
 <ATRIBUICAO>
 <CONDICAO>
@@ -76,31 +77,31 @@ Str : \"(.*)\"
 <ALGORITMO> ::= <CONJUNTO_INSTRUCOES>;
 
 <EXPR_ARIT> ::= <TERMO> <OP_ARIT>
-		| Var <OP_ARIT>
-		| AP <EXPR_ARIT_FP>;
+              | Var <OP_ARIT>
+              | AP <EXPR_ARIT_FP>;
 <EXPR_ARIT_FP> ::= <EXPR_ARIT> FP
-		| <EXPR_ARIT> FP <OP_ARIT>;
+                 | <EXPR_ARIT> FP <OP_ARIT>;
 <OP_ARIT> ::= OpArit <EXPR_ARIT> | OpArit <TERMO> | OpArit Var;
 
 <EXPR_REL> ::= <TERMO> <OP_REL> | Var <OP_REL> | <EXPR_ARIT> <OP_REL>;
 <OP_REL> ::= OpRel <TERMO> | OpRel Var | OpRel <EXPR_ARIT>;
 
 <EXPR_BOOL> ::= Var <OP_BOOL>
-		| <EXPR_REL> <OP_BOOL>
-		| AP <EXPR_BOOL_FP>;
- <EXPR_BOOL_FP> ::= <EXPR_BOOL> FP
-		| <EXPR_BOOL> FP  <OP_BOOL>;
+              | <EXPR_REL> <OP_BOOL>
+              | AP <EXPR_BOOL_FP>;
+<EXPR_BOOL_FP> ::= <EXPR_BOOL> FP
+                 | <EXPR_BOOL> FP  <OP_BOOL>;
 <OP_BOOL> ::= OpBool <EXPR_BOOL> | OpBool Var | OpBool <EXPR_REL>;
+
+<BOOL_RETURN> ::= <EXPR_REL> | <EXPR_BOOL>;
 
 <CONJUNTO_INSTRUCOES> ::= <INSTRUCAO> | <INSTRUCAO> <CONJUNTO_INSTRUCOES>;
 <INSTRUCAO> ::= <LEITURA> | <ATRIBUICAO> | <CONDICAO> | <LOOP> | <IMPRESSAO>;
 
-<BOOL_RETURN> ::= <EXPR_REL> | <EXPR_BOOL>;
-
 <LEITURA> ::= LER Var;
 <ATRIBUICAO> ::= ATR <TERMO> A Var
-		| ATR <EXPR_ARIT> A Var
-		| ATR Var A Var;
+               | ATR <EXPR_ARIT> A Var
+               | ATR Var A Var;
 <CONDICAO> ::= SE <BOOL_RETURN> ENT INI <CONJUNTO_INSTRUCOES> FIM | SE <BOOL_RETURN> ENT <INSTRUCAO>;
 <LOOP> ::= ENQ <BOOL_RETURN> INI <CONJUNTO_INSTRUCOES> FIM;
 <IMPRESSAO> ::= IMP <TERMO> | IMP Var;
