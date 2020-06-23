@@ -1,11 +1,14 @@
 #Options
 GenerateScanner = true
-GenerateParser = false
+GenerateParser = true
 Language = Java
 ScannerName = Lexico
+ParserName = Sintatico
+SemanticName = Semantico
 ScannerCaseSensitive = true
 ScannerTable = Hardcode
 Input = Stream
+Parser = SLR
 #RegularDefinitions
 d : [0-9]
 l : [a-zA-Z]
@@ -13,26 +16,93 @@ comentario : %.*\n
 ws : [\n\s\r\t]
 #Tokens
  : {comentario}|{ws}
-DEC : "DECLARACOES"
-ALG : "ALGORITMO"
-INT : "INTEIRO"
-REA : "REAL"
-ATR : "ATRIBUIR"
-A : "A"
-LER : "LER"
-IMP : "IMPRIMIR"
-SE : "SE"
-ENT : "ENTAO"
-ENQ : "ENQUANTO"
-INI : "INICIO"
-FIM : "FIM"
+DEC : DECLARACOES
+ALG : ALGORITMO
+INT : INTEIRO
+REA : REAL
+ATR : ATRIBUIR
+A : A
+LER : LER
+IMP : IMPRIMIR
+SE : SE
+ENT : ENTAO
+ENQ : ENQUANTO
+INI : INICIO
+FIM : FIM
+Delim : :
+AP : \(
+FP : \)
+NumI : {d}+
+NumR : {d}+,{d}+
 OpArit : (\*|/|\+|\-)
 OpRel : (<|<=|>=|>|=|<>)
-OpBool : ("E"|"OU")
-Delim : ":"
-AP : "("
-FP : ")"
+OpBool : (E|OU)
 Var : [a-z]({d}|{l})*
-NumI : (\+|\-)?{d}+
-NumR : (\+|\-)?{d}+","{d}+
-Str : \".*\"
+Str : \"(.*)\"
+#NonTerminals
+<PROGRAMA>
+<BLOCODEC>
+<DECLARACAO>
+<BLOCOALG>
+<ALGORITMO>
+
+<EXPR_ARIT>
+<EXPR_ARIT_FP>
+<OP_ARIT>
+
+<EXPR_REL>
+<OP_REL>
+
+<EXPR_BOOL>
+<EXPR_BOOL_FP>
+<OP_BOOL>
+
+<CONJUNTO_INSTRUCOES>
+<INSTRUCAO>
+
+<BOOL_RETURN>
+<LEITURA>
+<ATRIBUICAO>
+<CONDICAO>
+<LOOP>
+<IMPRESSAO>
+
+<TERMO>
+#Grammar
+<PROGRAMA> ::= <BLOCODEC><BLOCOALG>;
+<BLOCODEC> ::= Delim DEC <DECLARACAO>;
+<DECLARACAO> ::= Var Delim INT <DECLARACAO> | Var Delim REA  <DECLARACAO> | Var Delim INT | Var Delim REA;
+<BLOCOALG> ::= Delim ALG <ALGORITMO>;
+<ALGORITMO> ::= <CONJUNTO_INSTRUCOES>;
+
+<EXPR_ARIT> ::= <TERMO> <OP_ARIT>
+		| Var <OP_ARIT>
+		| AP <EXPR_ARIT_FP>;
+<EXPR_ARIT_FP> ::= <EXPR_ARIT> FP
+		| <EXPR_ARIT> FP <OP_ARIT>;
+<OP_ARIT> ::= OpArit <EXPR_ARIT> | OpArit <TERMO> | OpArit Var;
+
+<EXPR_REL> ::= <TERMO> <OP_REL> | Var <OP_REL> | <EXPR_ARIT> <OP_REL>;
+<OP_REL> ::= OpRel <TERMO> | OpRel Var | OpRel <EXPR_ARIT>;
+
+<EXPR_BOOL> ::= Var <OP_BOOL>
+		| <EXPR_REL> <OP_BOOL>
+		| AP <EXPR_BOOL_FP>;
+ <EXPR_BOOL_FP> ::= <EXPR_BOOL> FP
+		| <EXPR_BOOL> FP  <OP_BOOL>;
+<OP_BOOL> ::= OpBool <EXPR_BOOL> | OpBool Var | OpBool <EXPR_REL>;
+
+<CONJUNTO_INSTRUCOES> ::= <INSTRUCAO> | <INSTRUCAO> <CONJUNTO_INSTRUCOES>;
+<INSTRUCAO> ::= <LEITURA> | <ATRIBUICAO> | <CONDICAO> | <LOOP> | <IMPRESSAO>;
+
+<BOOL_RETURN> ::= <EXPR_REL> | <EXPR_BOOL>;
+
+<LEITURA> ::= LER Var;
+<ATRIBUICAO> ::= ATR <TERMO> A Var
+		| ATR <EXPR_ARIT> A Var
+		| ATR Var A Var;
+<CONDICAO> ::= SE <BOOL_RETURN> ENT INI <CONJUNTO_INSTRUCOES> FIM | SE <BOOL_RETURN> ENT <INSTRUCAO>;
+<LOOP> ::= ENQ <BOOL_RETURN> INI <CONJUNTO_INSTRUCOES> FIM;
+<IMPRESSAO> ::= IMP <TERMO> | IMP Var;
+
+<TERMO> ::= NumI | NumR;
