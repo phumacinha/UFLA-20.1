@@ -41,10 +41,22 @@ Var : [a-z]({d}|{l})*
 Str : \"(.*)\"
 #NonTerminals
 <PROGRAMA>
-<BLOCODEC>
+
+<BLOCO_DECL>
 <DECLARACAO>
-<BLOCOALG>
+<TIPO>
+
+<BLOCO_ALGO>
 <ALGORITMO>
+<BLOCO_INST>
+<INSTRUCAO>
+<ESCOPO>
+
+<ENTRADA>
+<ATRIBUICAO>
+<CONDICIONAL>
+<LOOP>
+<SAIDA>
 
 <EXPR_ARIT>
 <EXPR_ARIT_FP>
@@ -57,25 +69,31 @@ Str : \"(.*)\"
 <EXPR_BOOL_FP>
 <OP_BOOL>
 
-<BOOL_RETURN>
-
-<CONJUNTO_INSTRUCOES>
-<INSTRUCAO>
-
-<LEITURA>
-<ATRIBUICAO>
 <CONDICAO>
-<LOOP>
-<IMPRESSAO>
-
 <TERMO>
 #Grammar
-<PROGRAMA> ::= <BLOCODEC><BLOCOALG>;
-<BLOCODEC> ::= Delim DEC <DECLARACAO>;
-<DECLARACAO> ::= Var Delim INT <DECLARACAO> | Var Delim REA  <DECLARACAO> | Var Delim INT | Var Delim REA;
-<BLOCOALG> ::= Delim ALG <ALGORITMO>;
-<ALGORITMO> ::= <CONJUNTO_INSTRUCOES>;
-
+<PROGRAMA> ::= <BLOCO_DECL> <BLOCO_ALGO>;
+//Bloco de DECLARACOES
+<BLOCO_DECL> ::= Delim DEC <DECLARACAO>;
+<DECLARACAO> ::= Var Delim <TIPO> <DECLARACAO> | Var Delim <TIPO>;
+<TIPO> ::= INT | REA;
+//Bloco de ALGORITMO
+<BLOCO_ALGO> ::= Delim ALG <ALGORITMO>;
+<ALGORITMO> ::= <BLOCO_INST>;
+<BLOCO_INST> ::= <INSTRUCAO> | <INSTRUCAO> <BLOCO_INST>;
+<INSTRUCAO> ::= <ENTRADA> | <ATRIBUICAO> | <CONDICIONAL> | <LOOP>
+              | <SAIDA>;
+<ESCOPO> ::= INI <BLOCO_INST> FIM;
+//BLOCOINS permitidas
+<ENTRADA> ::= LER Var;
+<ATRIBUICAO> ::= ATR <TERMO> A Var
+               | ATR <EXPR_ARIT> A Var
+               | ATR Var A Var;
+<CONDICIONAL> ::= SE <CONDICAO> ENT <ESCOPO>
+                | SE <CONDICAO> ENT <INSTRUCAO>;
+<LOOP> ::= ENQ <CONDICAO> <ESCOPO>;
+<SAIDA> ::= IMP <TERMO> | IMP Var | IMP Str;
+//Expressoes permitidas (aritmetica, relacional e booleana)
 <EXPR_ARIT> ::= <TERMO> <OP_ARIT>
               | Var <OP_ARIT>
               | AP <EXPR_ARIT_FP>;
@@ -88,22 +106,12 @@ Str : \"(.*)\"
 
 <EXPR_BOOL> ::= Var <OP_BOOL>
               | <EXPR_REL> <OP_BOOL>
+              | Str <OP_BOOL>
               | AP <EXPR_BOOL_FP>;
 <EXPR_BOOL_FP> ::= <EXPR_BOOL> FP
-                 | <EXPR_BOOL> FP  <OP_BOOL>;
-<OP_BOOL> ::= OpBool <EXPR_BOOL> | OpBool Var | OpBool <EXPR_REL>;
+                 | <EXPR_BOOL> FP <OP_BOOL>;
+<OP_BOOL> ::= OpBool <EXPR_BOOL> | OpBool Var
+            | OpBool <EXPR_REL> | OpBool Str;
 
-<BOOL_RETURN> ::= <EXPR_REL> | <EXPR_BOOL>;
-
-<CONJUNTO_INSTRUCOES> ::= <INSTRUCAO> | <INSTRUCAO> <CONJUNTO_INSTRUCOES>;
-<INSTRUCAO> ::= <LEITURA> | <ATRIBUICAO> | <CONDICAO> | <LOOP> | <IMPRESSAO>;
-
-<LEITURA> ::= LER Var;
-<ATRIBUICAO> ::= ATR <TERMO> A Var
-               | ATR <EXPR_ARIT> A Var
-               | ATR Var A Var;
-<CONDICAO> ::= SE <BOOL_RETURN> ENT INI <CONJUNTO_INSTRUCOES> FIM | SE <BOOL_RETURN> ENT <INSTRUCAO>;
-<LOOP> ::= ENQ <BOOL_RETURN> INI <CONJUNTO_INSTRUCOES> FIM;
-<IMPRESSAO> ::= IMP <TERMO> | IMP Var;
-
+<CONDICAO> ::= <EXPR_REL> | <EXPR_BOOL>;
 <TERMO> ::= NumI | NumR;
