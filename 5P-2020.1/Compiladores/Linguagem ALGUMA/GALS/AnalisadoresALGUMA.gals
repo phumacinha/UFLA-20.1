@@ -71,6 +71,7 @@ Str : \"(.*)\"
 
 <CONDICAO>
 <TERMO>
+
 #Grammar
 <PROGRAMA> ::= <BLOCO_DECL> <BLOCO_ALGO>;
 //Bloco de DECLARACOES
@@ -81,10 +82,13 @@ Str : \"(.*)\"
 <BLOCO_ALGO> ::= Delim ALG <ALGORITMO>;
 <ALGORITMO> ::= <BLOCO_INST>;
 <BLOCO_INST> ::= <INSTRUCAO> | <INSTRUCAO> <BLOCO_INST>;
-<INSTRUCAO> ::= <ENTRADA> | <ATRIBUICAO> | <CONDICIONAL> | <LOOP>
+<INSTRUCAO> ::= <ENTRADA>
+              | <ATRIBUICAO>
+              | <CONDICIONAL>
+              | <LOOP>
               | <SAIDA>;
 <ESCOPO> ::= INI <BLOCO_INST> FIM;
-//BLOCOINS permitidas
+//Instruções permitidas
 <ENTRADA> ::= LER Var;
 <ATRIBUICAO> ::= ATR <TERMO> A Var
                | ATR <EXPR_ARIT> A Var
@@ -92,7 +96,7 @@ Str : \"(.*)\"
 <CONDICIONAL> ::= SE <CONDICAO> ENT <ESCOPO>
                 | SE <CONDICAO> ENT <INSTRUCAO>;
 <LOOP> ::= ENQ <CONDICAO> <ESCOPO>;
-<SAIDA> ::= IMP <TERMO> | IMP Var | IMP Str;
+<SAIDA> ::= IMP <TERMO> | IMP <EXPR_ARIT> | IMP Var | IMP Str;
 //Expressoes permitidas (aritmetica, relacional e booleana)
 <EXPR_ARIT> ::= <TERMO> <OP_ARIT>
               | Var <OP_ARIT>
