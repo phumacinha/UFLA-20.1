@@ -4,7 +4,11 @@
 #include <vector>
 
 using namespace std;
-
+/*******************************************************************************
+ * Classe Matriz que implementa operações entre matrizes através de sobrecarga
+ * de operadores, métodos de inserção e alteração de elementos e método de
+ * impressão.
+*******************************************************************************/
 class Matriz {
     public:
         Matriz();
@@ -35,7 +39,7 @@ class Matriz {
         static Matriz matriz_identidade (int n);
     
     private:
-        double **matriz;
+        vector<vector<double>> matriz; //double **matriz;
         int num_linhas=0, num_colunas=0;
 
         void iniciar_matriz(int num_linhas, int num_colunas);
@@ -56,11 +60,8 @@ Matriz::Matriz(int num_linhas, int num_colunas, vector<double> elems) {
 }
 
 void Matriz::iniciar_matriz(int num_linhas, int num_colunas) {
-    this->desaloca_matriz();
-    this->matriz = new double *[num_linhas];
-    for(int i=0; i<num_linhas; i++) {
-        this->matriz[i] = new double[num_colunas];
-    }
+    desaloca_matriz();
+    matriz.assign(num_linhas, vector<double>(num_colunas));
     this->num_linhas = num_linhas;
     this->num_colunas = num_colunas;
 }
@@ -70,29 +71,23 @@ Matriz::~Matriz() {
 }
 
 void Matriz::desaloca_matriz() {
-    if (this->get_num_linhas() > 0) {
-        for(int n=0; n<this->get_num_linhas(); n++) {
-            delete[] this->matriz[n];
-        }
-
-        delete[] this->matriz;
-    }
+    matriz.clear();
 }
 
 int Matriz::get_num_linhas() const {
-    return this->num_linhas;
+    return num_linhas;
 }
 
 int Matriz::get_num_colunas() const {
-    return this->num_colunas;
+    return num_colunas;
 }
 
 double Matriz::get_elem_pos(int i, int j) const {
-    return this->matriz[i][j];
+    return matriz[i][j];
 }
 
 void Matriz::insere_elemento_pos(int i, int j, double elem) {
-    this->matriz[i][j] = elem;
+    matriz[i][j] = elem;
 }
 
 void Matriz::insere_elementos(vector<double> elems) {
@@ -114,7 +109,7 @@ void Matriz::imprimir() const {
 }
 
 bool Matriz::operator==(const Matriz & outra_matriz) const{
-    bool eh_igual = (this->get_num_linhas() == outra_matriz.get_num_linhas()) && (this->get_num_colunas() == outra_matriz.get_num_colunas());
+    bool eh_igual = (get_num_linhas() == outra_matriz.get_num_linhas()) && (get_num_colunas() == outra_matriz.get_num_colunas());
 
     if (eh_igual) {
         for (int i=0; i<get_num_linhas(); i++) {
@@ -131,14 +126,14 @@ bool Matriz::operator==(const Matriz & outra_matriz) const{
 
 template <class T> 
 T Matriz::operator-(const T &outra_matriz) const {
-    int m = this->get_num_linhas();
-    int n = this->get_num_colunas();
+    int m = get_num_linhas();
+    int n = get_num_colunas();
     T resultado;
     resultado.iniciar_matriz(m, n);
 
     for (int i=0; i<m; i++) {
         for (int j=0; j<n; j++) {
-            double elem = this->get_elem_pos(i,j) - outra_matriz.get_elem_pos(i,j);
+            double elem = get_elem_pos(i,j) - outra_matriz.get_elem_pos(i,j);
             resultado.insere_elemento_pos(i, j, elem);
         }
     }
@@ -148,8 +143,8 @@ T Matriz::operator-(const T &outra_matriz) const {
 
 template <class T> 
 T Matriz::operator+(const T &outra_matriz) const {
-    int m = this->get_num_linhas();
-    int n = this->get_num_colunas();
+    int m = get_num_linhas();
+    int n = get_num_colunas();
     T resultado;
     resultado.iniciar_matriz(m, n);
 
@@ -197,8 +192,8 @@ void Matriz::operator=(const Matriz &outra_matriz) {
         }
     }
 
-    this->iniciar_matriz(m,n);
-    this->insere_elementos(elems);
+    iniciar_matriz(m,n);
+    insere_elementos(elems);
 }
 
 Matriz Matriz::operator*(double x) const {
@@ -253,10 +248,37 @@ class Elemento : public Matriz {
         Elemento(double x, double y, double z, double w);
         Elemento(double x, double y, double z);
         double get_coord(int pos) const;
+        double get_coord(char coord) const;
         void altera_coord(int pos, double valor);
+        void altera_coord(char coord, double valor);
+        void converte_tipo(Elemento elem);
+    private:
+        void inicializa_coordenadas(vector<double> coords);
+        int id_coord(char coord) const;
 };
 
 Elemento::Elemento(vector<double> coords) : Matriz(4,1) {
+    inicializa_coordenadas(coords);
+}
+
+Elemento::Elemento(double x, double y, double z, double w) : Matriz(4,1) {
+    vector<double> coords;
+    coords.push_back(x);
+    coords.push_back(y);
+    coords.push_back(z);
+    coords.push_back(w);
+    inicializa_coordenadas(coords);
+}
+
+Elemento::Elemento(double x, double y, double z) : Matriz(4,1) {
+    vector<double> coords;
+    coords.push_back(x);
+    coords.push_back(y);
+    coords.push_back(z);
+    inicializa_coordenadas(coords);
+}
+
+void Elemento::inicializa_coordenadas(vector<double> coords) {
     int comprimento_param = coords.size();
     
     for (int i=0; i<comprimento_param; i++) {
@@ -264,29 +286,36 @@ Elemento::Elemento(vector<double> coords) : Matriz(4,1) {
     }
 }
 
-Elemento::Elemento(double x, double y, double z, double w) : Matriz(4,1) {
-    insere_elemento_pos(0, 0, x);
-    insere_elemento_pos(1, 0, y);
-    insere_elemento_pos(2, 0, z);
-    insere_elemento_pos(3, 0, w);
-}
+int Elemento::id_coord(char coord) const {
+    switch (coord) {
+        case 'x': return 0;
+        case 'y': return 1;
+        case 'z': return 2;
+        case 'w': return 3;
+    }
 
-Elemento::Elemento(double x, double y, double z) : Matriz(4,1) {
-    insere_elemento_pos(0, 0, x);
-    insere_elemento_pos(1, 0, y);
-    insere_elemento_pos(2, 0, z);
+    return -1;
 }
 
 double Elemento::get_coord(int pos) const {
     return get_elem_pos(pos, 0);
 }
 
+double Elemento::get_coord(char coord) const {
+    return get_elem_pos(id_coord(coord), 0);
+}
+
 void Elemento::altera_coord(int pos, double valor) {
     insere_elemento_pos(pos, 0, valor);
 }
 
+void Elemento::altera_coord(char coord, double valor) {
+    insere_elemento_pos(id_coord(coord), 0, valor);
+}
 
-
+void Elemento::converte_tipo(Elemento elem) {
+    inicializa_coordenadas(elem.to_vector());
+}
 
 
 
@@ -337,7 +366,7 @@ Ponto Ponto::operator-(const Ponto & outro_ponto) const {
     vector<double> novas_coords;
 
     for (int i=0; i<3; i++) {
-        novas_coords.push_back(this->get_coord(i) - outro_ponto.get_coord(i));
+        novas_coords.push_back(get_coord(i) - outro_ponto.get_coord(i));
     }
 
     return Ponto(novas_coords);
@@ -347,7 +376,7 @@ Ponto Ponto::operator+(const Ponto & outro_ponto) const {
     vector<double> novas_coords;
 
     for (int i=0; i<3; i++) {
-        novas_coords.push_back(this->get_coord(i) + outro_ponto.get_coord(i));
+        novas_coords.push_back(get_coord(i) + outro_ponto.get_coord(i));
     }
 
     return Ponto(novas_coords);
@@ -379,9 +408,8 @@ double Vetor::get_comprimento() const {
 }
 
 void Vetor::normalizar() {
-    double comprimento = get_comprimento();
     for (int i=0; i<3; i++) {
-        altera_coord(i, get_coord(i)/comprimento);
+        altera_coord(i, get_coord(i)/get_comprimento());
     }
 }
 
@@ -494,27 +522,26 @@ Matriz Transformacao::cisalhamento(double fatores[2], char dimensao_fixa){
 
 class Projecao {
     public:
-       Projecao(Ponto *origem, Vetor *eixo_x, Vetor *eixo_y, Elemento *centro_dir_projecao);
+       Projecao(Ponto origem, Vetor eixo_x, Vetor eixo_y, Elemento centro_dir_projecao);
        Matriz matriz_projecao();
 
     private:
-        Ponto *origem;
-        Vetor *eixo_x, *eixo_y;
-        Elemento *centro_dir_projecao;
+        Ponto origem;
+        Vetor eixo_x, eixo_y;
+        Elemento centro_dir_projecao;
         bool eh_paralela, eh_perspectiva;
 
         Matriz matriz_projecao_paralela();
         Matriz matriz_projecao_perspectiva();
 };
 
-
-Projecao::Projecao(Ponto *origem, Vetor *eixo_x, Vetor *eixo_y, Elemento *centro_dir_projecao) {
+Projecao::Projecao(Ponto origem, Vetor eixo_x, Vetor eixo_y, Elemento centro_dir_projecao) {
     this->origem = origem;
     this->eixo_x = eixo_x;
     this->eixo_y = eixo_y;
     this->centro_dir_projecao = centro_dir_projecao;
 
-    this->eh_paralela = this->centro_dir_projecao->get_coord(3) == 0;
+    this->eh_paralela = centro_dir_projecao.get_coord('w') == 0;
     this->eh_perspectiva = !this->eh_paralela;
 }
 
@@ -524,44 +551,43 @@ Matriz Projecao::matriz_projecao() {
 
 Matriz Projecao::matriz_projecao_paralela() {
     Matriz matriz_projecao;
-    Ponto fatores_translacao = Transformacao::ORIGEM_SCM - *(this->origem);
     Vetor dir_projecao, vetor_aux;
-    dir_projecao = *(this->centro_dir_projecao);
+    dir_projecao = centro_dir_projecao;
    
     // Translacao que leva a origem do PP na origem do SCM.
-    matriz_projecao = Transformacao::translacao(fatores_translacao.to_vector());
+    matriz_projecao = Transformacao::translacao((Transformacao::ORIGEM_SCM - origem).to_vector());
     
     // Rotacao no eixo Y, em torno da origem (relativa a SCM) que leva a direcao de X do PP no plano XY do SCM.
     Vetor eixo_x_scm(1,0,0);
     Vetor eixo_y_scm(0,1,0);
     Vetor eixo_z_scm(0,0,1);
 
-    vetor_aux = *this->eixo_x;
+    vetor_aux = eixo_x;
     vetor_aux.altera_coord(1, 0);
     double angulo = Vetor::angulo_entre_vetores(eixo_x_scm, vetor_aux);
 
     Matriz rotacao_y = Transformacao::rotacao(angulo, 'y');
-    *this->eixo_x = rotacao_y**this->eixo_x;
-    *this->eixo_y = rotacao_y**this->eixo_y;
+    eixo_x = rotacao_y*eixo_x;
+    eixo_y = rotacao_y*eixo_y;
     dir_projecao = rotacao_y*dir_projecao;
     matriz_projecao = matriz_projecao*rotacao_y;
    
     // Rotação no eixo Z, em torno da origem (relativa a SCM) que leva a direção de X  do PP a coincidir com a direção de X do SCM.
-    angulo = Vetor::angulo_entre_vetores(eixo_x_scm, *(this->eixo_x));
+    angulo = Vetor::angulo_entre_vetores(eixo_x_scm, eixo_x);
     Matriz rotacao_z = Transformacao::rotacao(angulo, 'z');
-    *this->eixo_x = rotacao_z**this->eixo_x;
-    *this->eixo_y = rotacao_z**this->eixo_y;
+    eixo_x = rotacao_z*eixo_x;
+    eixo_y = rotacao_z*eixo_y;
     dir_projecao = rotacao_z*dir_projecao;
     matriz_projecao = matriz_projecao*rotacao_z;
  
     // Rotação no eixo X, em torno da origem (relativa a SCM) que leva a direção de Y  do PP a coincidir com a direção de Y do SCM.
-    if (Vetor::angulo_entre_vetores(eixo_y_scm, *(this->eixo_y)) != 0) {
+    if (Vetor::angulo_entre_vetores(eixo_y_scm, eixo_y) != 0) {
         cout << "aqu";
-        vetor_aux = *(this->eixo_y);
+        vetor_aux = eixo_y;
         vetor_aux.altera_coord(1, 0);
         angulo = Vetor::angulo_entre_vetores(eixo_x_scm, vetor_aux);
         Matriz rotacao_x = Transformacao::rotacao(angulo, 'x');
-        *this->eixo_y = rotacao_x**this->eixo_y;
+        eixo_y = rotacao_x*eixo_y;
         dir_projecao = rotacao_x*dir_projecao;
         matriz_projecao = matriz_projecao*rotacao_x;
     }
@@ -592,43 +618,42 @@ Matriz Projecao::matriz_projecao_paralela() {
 
 Matriz Projecao::matriz_projecao_perspectiva() {
     Ponto centro_de_projecao;
-    centro_de_projecao = *(this->centro_dir_projecao);
+    centro_de_projecao.converte_tipo(this->centro_dir_projecao);
     Vetor vetor_aux;
     Matriz matriz_projecao;
-    Ponto fatores_translacao = Transformacao::ORIGEM_SCM - centro_de_projecao;
    
     // Translacao que leva a origem do PP na origem do SCM.
-    matriz_projecao = Transformacao::translacao(fatores_translacao.to_vector());
+    matriz_projecao = Transformacao::translacao((Transformacao::ORIGEM_SCM - centro_de_projecao).to_vector());
 
     // Rotacao no eixo Y, em torno da origem (relativa a SCM) que leva a direcao de X do PP no plano XY do SCM.
     Vetor eixo_x_scm(1,0,0);
     Vetor eixo_y_scm(0,1,0);
     Vetor eixo_z_scm(0,0,1);
 
-    vetor_aux = *this->eixo_x;
+    vetor_aux = eixo_x;
     vetor_aux.altera_coord(1, 0);
     double angulo = Vetor::angulo_entre_vetores(eixo_x_scm, vetor_aux);
 
     Matriz rotacao_y = Transformacao::rotacao(angulo, 'y');
-    *this->eixo_x = rotacao_y**this->eixo_x;
-    *this->eixo_y = rotacao_y**this->eixo_y;
+    eixo_x = rotacao_y*eixo_x;
+    eixo_y = rotacao_y*eixo_y;
     matriz_projecao = matriz_projecao*rotacao_y;
    
     // Rotação no eixo Z, em torno da origem (relativa a SCM) que leva a direção de X  do PP a coincidir com a direção de X do SCM.
-    angulo = Vetor::angulo_entre_vetores(eixo_x_scm, *(this->eixo_x));
+    angulo = Vetor::angulo_entre_vetores(eixo_x_scm, eixo_x);
     Matriz rotacao_z = Transformacao::rotacao(angulo, 'z');
-    *this->eixo_x = rotacao_z**this->eixo_x;
-    *this->eixo_y = rotacao_z**this->eixo_y;
+    eixo_x = rotacao_z*eixo_x;
+    eixo_y = rotacao_z*eixo_y;
     matriz_projecao = matriz_projecao*rotacao_z;
  
     // Rotação no eixo X, em torno da origem (relativa a SCM) que leva a direção de Y  do PP a coincidir com a direção de Y do SCM.
-    if (Vetor::angulo_entre_vetores(eixo_y_scm, *(this->eixo_y)) != 0) {
+    if (Vetor::angulo_entre_vetores(eixo_y_scm, eixo_y) != 0) {
         cout << "aqu";
-        vetor_aux = *(this->eixo_y);
+        vetor_aux = eixo_y;
         vetor_aux.altera_coord(1, 0);
         angulo = Vetor::angulo_entre_vetores(eixo_x_scm, vetor_aux);
         Matriz rotacao_x = Transformacao::rotacao(angulo, 'x');
-        *this->eixo_y = rotacao_x**this->eixo_y;
+        eixo_y = rotacao_x*eixo_y;
         matriz_projecao = matriz_projecao*rotacao_x;
     }
 
@@ -689,10 +714,9 @@ int main () {
     Vetor eixo_x(direcao_x_pp);
     Vetor eixo_y(direcao_y_pp);
     Elemento centro_dir_projecao(centro_dir);
-    Projecao plano_projecao(&origem_pp, &eixo_x, &eixo_y, &centro_dir_projecao);
-    Matriz matriz_projecao = plano_projecao.matriz_projecao();
-    cout << endl << endl;
-    matriz_projecao.imprimir();
+    Projecao plano_projecao(origem_pp, eixo_x, eixo_y, centro_dir_projecao);
+    cout << endl;
+    plano_projecao.matriz_projecao().imprimir();
 }
 
 /*
