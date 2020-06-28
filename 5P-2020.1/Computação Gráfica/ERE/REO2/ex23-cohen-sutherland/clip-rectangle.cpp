@@ -5,7 +5,7 @@
 using namespace std;
 
 ClipRectangle::ClipRectangle (double xmin, double xmax, double ymin, double ymax)
-    : mXmin(xmin), mXmax(xmax), mYmin(ymin), mYmax(ymax), mInitialized(true)
+    : mXmin(xmin), mXmax(xmax), mYmin(ymin), mYmax(ymax), mInitialized(true) 
 {}
 
 void ClipRectangle::Set(double xmin, double xmax, double ymin, double ymax)
@@ -22,95 +22,75 @@ void ClipRectangle::Set(double xmin, double xmax, double ymin, double ymax)
 // A linha alocada aqui será desalocada na função CleanUp().
 Line* ClipRectangle::Clip(const Line& l)
 {
-    const int INSIDE = 0; // 0000 
-    const int LEFT = 1; // 0001 
-    const int RIGHT = 2; // 0010 
-    const int BOTTOM = 4; // 0100 
-    const int TOP = 8; // 1000 
+    Point P0 = l.mP0;
+    Point P1 = l.mP1;
 
-    const double newXmin = 0;
-    const double newXmax = mXmax - mXmin;
-    const double newYmin = 0;
-    const double newYmax = mYmax - mYmin;
-
-    const Point translacao(mXmin, mYmin);
-
-    Point *P0 = l.mP0;
-    Point *P1 = l.mP1;
-
-    int code_P0 = INSIDE;
-    int code_P1 = INSIDE;
-
-    if (P0.mX < newXmin)
-        code_P0 |= LEFT;
-    else if (P0.mX > newXmax) // to the right of rectangle 
-        code_P0 |= RIGHT; 
-    if (P0.mY < newYmin) // below the rectangle 
-        code_P0 |= BOTTOM; 
-    else if (P0.mY > newYmax) // above the rectangle 
-        code_P0 |= TOP;
-
-    if (P1.mX < newXmin)
-        code_P1 |= LEFT;
-    else if (P1.mX > newXmax) // to the right of rectangle 
-        code_P1 |= RIGHT; 
-    if (P1.mY < newYmin) // below the rectangle 
-        code_P1 |= BOTTOM; 
-    else if (P1.mY > newYmax) // above the rectangle 
-        code_P1 |= TOP; 
-
-
-    bool linhaDentro = false;
+    int code_P0 = PositionCode(P0);
+    int code_P1 = PositionCode(P1);
 
     while (true) {
-        if (code_P0 == 0 && code_P1 == 0) {
-            linhaDentro = true;
-            break;
+        // Se os dois pontos possuem codigo zero, ambos estao dentro da area de recorte.
+        if (!(code_P0 | code_P1)) {
+            return new Line(P0, P1);
         }
-        else if (code_P0 && code_P1) {
-            break;
+        // Se os codigos dos dois pontos possuem um bit 1 na mesma posicao, a
+        // linha toda esta fora da area de recorte.
+        else if (code_P0 & code_P1) {
+            return new Line();
         }
         else {
-            int code_out;
+            int code;
             double x, y;
 
-            if (code_P0 != 0) code_out = code_P0;
-            else code_out = code_P1;
+            // Seleciona o ponto com maior diferenca de 0, ou seja, com mais intersecoes.
+            code = code_P0 > code_P1 ? code_P0 : code_P1;
 
-
-            if (code_out & TOP) {
-                x = P0.mX + (P1.mX - P0.mx) * (newYmax - P0.mY) / (P1.mY - P0.mY);
-                y = newYmax;
+            // Verifica com qual lado do retangulo de recorte ha intersecao e calcula
+            // o ponto de intersecao utilizando semelhanca de triangulos.
+            if (code & TOP) {
+                x = P0.mX + (P1.mX - P0.mX) * (mYmax - P0.mY) / (P1.mY - P0.mY);
+                y = mYmax;
             }
-            else if (code_out & BOTTOM) {
-                x = P0.mX + (P1.mX - P0.mX) * (newYmin - P0.mY) / (P1.mY - P0.mY);
-                y = newYmin;
+            else if (code & BOTTOM) {
+                x = P0.mX + (P1.mX - P0.mX) * (mYmin - P0.mY) / (P1.mY - P0.mY);
+                y = mYmin;
             }
-            else if (code_out & RIGHT) {
-                y = P0.mY + (P1.mY - P0.mY) * (newXmax - P0.mX) / (P1.mX - P0.mX);
-                x = newXmax;
+            else if (code & RIGHT) {
+                y = P0.mY + (P1.mY - P0.mY) * (mXmax - P0.mX) / (P1.mX - P0.mX);
+                x = mXmax;
             }
-            else if (code_out & LEFT) {
-                y = P0.mY + (P1.mY - P0.mY) * (newXmin - P0.mX) / (P1.mX - P0.mX);
-                x = newXmin;
+            else if (code & LEFT) {
+                y = P0.mY + (P1.mY - P0.mY) * (mXmin - P0.mX) / (P1.mX - P0.mX);
+                x = mXmin;
             }
 
 
-
-            if (code_out == code_P0) { 
+            // Atuliza pontos
+            if (code == code_P0) { 
                 P0.mX = x; 
                 P0.mY = y;
+                code_P0 = PositionCode(P0);
             } 
             else { 
                 P1.mX = x; 
-                P2.mY = y;
-            } 
-
-            if (linhaDentro) return new Line(P0, P1);
-            else return Line();
+                P1.mY = y;
+                code_P1 = PositionCode(P1);
+            }
         }
     }
+}
 
+// Retorna o codigo de localizacao de um ponto.
+int ClipRectangle::PositionCode(const Point &P) {
+    int code = INSIDE;
+
+    if (P.mX < mXmin) code |= LEFT;
+    else if (P.mX > mXmax) code |= RIGHT; 
+
+    if (P.mY < mYmin) code |= BOTTOM; 
+    else if (P.mY > mYmax)  code |= TOP;
+
+    return code;
 }
 
 void ClipRectangle::Read(const string& prompt)

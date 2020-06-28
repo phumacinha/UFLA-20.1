@@ -18,14 +18,20 @@ class ClipRectangle
         double XMax() { return mXmax; }
         double YMin() { return mYmin; }
         double YMax() { return mYmax; }
+        static const int INSIDE = 0; // 0000 
+        static const int LEFT = 1; // 0001 
+        static const int RIGHT = 2; // 0010 
+        static const int BOTTOM = 4; // 0100 
+        static const int TOP = 8; // 1000
 
     private:
         bool Positive(double n) { return n > 0; }
+        int PositionCode(const Point &P);
         double mXmin;
         double mXmax;
         double mYmin;
         double mYmax;
-        bool	mInitialized;
+        bool mInitialized;
 };
 
 #endif
