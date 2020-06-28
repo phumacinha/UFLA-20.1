@@ -1,0 +1,22 @@
+Inicializar a posição de início com 0.
+Inicializar a posição de fim com 1.
+Para cada lado da área de recorte:
+    Calcular o númerador e o denominador da fórmula de t.
+    Se o segmento for paralelo ao lado de recorte, então
+        Se o segmento estiver fora da área em relação ao lado, então
+            Responder com segmento vazio.
+    senão:
+        Calcular o valor de t.
+        Se o segmento está potencialmente entrando, então
+            Se a interseção for posterior à posição de fim, então
+                Responder com segmento vazio.
+            Se a interseção for posterior à posição de início, então
+                Atualizar a posição de início.
+        senão:
+            Se a interseção for anterior à posição de início, então
+                Responder com segmento vazio.
+            Se a interseção for anterior à posição de fim, então
+                Atualizar a posição de fim.
+Calcular as coordenadas da posição de início, se não forem as de P0.
+Calcular as coordenadas da posição de fim, se não forem as de P1.
+Responder com um segmento dado pelas coordenadas calculadas em (4) e (5)
