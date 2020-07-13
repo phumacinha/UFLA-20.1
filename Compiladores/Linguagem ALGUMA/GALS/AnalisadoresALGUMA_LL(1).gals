@@ -1,0 +1,142 @@
+#Options
+GenerateScanner = true
+GenerateParser = true
+Language = Java
+ScannerName = Lexico
+ParserName = Sintatico
+SemanticName = Semantico
+ScannerCaseSensitive = true
+ScannerTable = Hardcode
+Input = Stream
+Parser = LL
+#RegularDefinitions
+d : [0-9]
+l : [a-zA-Z]
+comentario : %.*\n
+ws : [\n\s\r\t]
+#Tokens
+ : {comentario}|{ws}
+DEC : DECLARACOES
+ALG : ALGORITMO
+INT : INTEIRO
+REA : REAL
+ATR : ATRIBUIR
+A : A
+LER : LER
+IMP : IMPRIMIR
+SE : SE
+ENT : ENTAO
+ENQ : ENQUANTO
+INI : INICIO
+FIM : FIM
+Delim : :
+AP : \(
+FP : \)
+NumI : {d}+
+NumR : {d}+,{d}+
+OpArit : (\*|/|\+|\-)
+OpRel : (<|<=|>=|>|=|<>)
+OpBool : (E|OU)
+Var : [a-z]({d}|{l})*
+Str : \"(.*)\"
+#NonTerminals
+<PROGRAMA>
+
+<BLOCO_DECL>
+<DECLARACAO>
+<DECLARACAO_AUX>
+<TIPO>
+
+<BLOCO_ALGO>
+<BLOCO_INST>
+<BLOCO_INST_AUX>
+<INSTRUCAO>
+<ESCOPO>
+
+<ENTRADA>
+<ATRIBUICAO>
+<ATRIBUICAO_AUX>
+<CONDICIONAL>
+<CONDICIONAL_AUX>
+<LOOP>
+<SAIDA>
+<SAIDA_AUX>
+
+<EXPR_ARIT>
+<EXPR_ARIT_FP>
+<EXPR_ARIT_FP_AUX>
+<OP_ARIT>
+
+<EXPR_REL>
+<OP_REL>
+
+<OPERANDO>
+
+<EXPR_BOOL>
+<EXPR_BOOL_FP>
+<EXPR_BOOL_FP_AUX>
+<OP_BOOL>
+<OP_BOOL_AUX>
+
+<CONDICAO>
+<TERMO>
+
+#Grammar
+<PROGRAMA> ::= <BLOCO_DECL> <BLOCO_ALGO>;
+
+//////////////////////
+//Bloco de DECLARACOES
+<BLOCO_DECL> ::= Delim DEC <DECLARACAO>;
+<DECLARACAO> ::= Var Delim <TIPO> <DECLARACAO_AUX>;
+<DECLARACAO_AUX> ::= <DECLARACAO> | î;
+<TIPO> ::= INT | REA;
+
+////////////////////
+//Bloco de ALGORITMO
+<BLOCO_ALGO> ::= Delim ALG <BLOCO_INST>;
+<BLOCO_INST> ::= <INSTRUCAO> <BLOCO_INST_AUX>;
+<BLOCO_INST_AUX> ::= <BLOCO_INST> | î;
+<INSTRUCAO> ::= <ENTRADA>
+              | <ATRIBUICAO>
+              | <CONDICIONAL>
+              | <LOOP>
+              | <SAIDA>;
+<ESCOPO> ::= INI <BLOCO_INST> FIM;
+
+///////////////////////
+//Instruções permitidas
+<ENTRADA> ::= LER Var;
+
+<ATRIBUICAO> ::= ATR <ATRIBUICAO_AUX>;
+<ATRIBUICAO_AUX> ::= <TERMO> A Var | <EXPR_ARIT> A Var | Var A Var;
+<CONDICIONAL> ::= SE <CONDICAO> ENT <CONDICIONAL_AUX>;
+<CONDICIONAL_AUX> ::= <ESCOPO> | <INSTRUCAO>;
+<LOOP> ::= ENQ <CONDICAO> <ESCOPO>;
+<SAIDA> ::= IMP <SAIDA_AUX>;
+<SAIDA_AUX> ::= <TERMO> | <EXPR_ARIT> | Var | Str;
+//Expressoes permitidas (aritmetica, relacional e booleana)
+<EXPR_ARIT> ::= <TERMO> <OP_ARIT>
+              | Var <OP_ARIT>
+              | AP <EXPR_ARIT_FP>;
+
+<EXPR_ARIT_FP> ::= <EXPR_ARIT> FP <EXPR_ARIT_FP_AUX>;
+<EXPR_ARIT_FP_AUX> ::= <OP_ARIT> | î;
+<OP_ARIT> ::= OpArit <OPERANDO>;
+
+<EXPR_REL> ::= <TERMO> <OP_REL> | Var <OP_REL> | <EXPR_ARIT> <OP_REL>;
+<OP_REL> ::= OpRel <OPERANDO>;
+
+<OPERANDO> ::= <EXPR_ARIT> | <TERMO> | Var;
+
+<EXPR_BOOL> ::= Var <OP_BOOL>
+              | <EXPR_REL> <OP_BOOL>
+              | Str <OP_BOOL>
+              | AP <EXPR_BOOL_FP>;
+<EXPR_BOOL_FP> ::= <EXPR_BOOL> FP <EXPR_BOOL_FP_AUX>;
+<EXPR_BOOL_FP_AUX> ::= <OP_BOOL> | î;
+
+<OP_BOOL> ::= OpBool <OP_BOOL_AUX>;
+<OP_BOOL_AUX> ::= <EXPR_BOOL> | Var | <EXPR_REL> | Str;
+
+<CONDICAO> ::= <EXPR_REL> | <EXPR_BOOL>;
+<TERMO> ::= NumI | NumR;
