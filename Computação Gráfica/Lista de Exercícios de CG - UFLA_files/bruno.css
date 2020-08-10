@@ -1,0 +1,235 @@
+h1{ 
+    font-family: "Helvetica", "Lucida", "Arial",sans-serif; 
+    font-size: 1.5em; 
+    font-weight: 600;
+    padding: 0.2em; 
+    background: #DDDDDD }
+h2, h2 a { 
+    font-family: "Helvetica", "Lucida", "Arial",sans-serif; 
+    clear: both;
+    font-size: 1.17em;
+    font-weight: 600 }
+h3, h3 a { 
+    font-family: "Helvetica", "Lucida", "Arial",sans-serif; 
+    clear: both;
+    font-size: 1em; 
+    font-weight: 600; 
+    font-style: italic }
+
+a { text-decoration: none }
+a:hover { text-decoration: underline }
+a.externa {
+    background: url(external.png) center right no-repeat;
+    padding-right: 13px;
+}
+
+a img {
+    border: none
+}
+
+a.arquivo {
+    background: url(arquivo.png) center right no-repeat;
+    padding-right: 17px;
+}
+
+body { font-family: "Helvetica", "Lucida", "Arial", sans-serif; 
+       margin-left: 30px;
+       margin-right: 30px;
+       font-size: 1em;
+       text-align: justify;
+       background: #C0C0C0 }
+
+div.cabecalho {
+   text-align: center;
+   margin-top: 1em;
+   margin-left: auto;
+   margin-right: auto;
+    width: 40em
+}
+
+div.cabecalho img {
+    float: left;
+    margin-right: 1em
+}
+
+div.cabecalho a {
+    color: #111155
+}
+
+div.titulo {
+    font-size: 1.45em;
+}
+
+div.areas {
+   margin-top: 0.8em;
+    font-size: 0.8em;
+}
+
+div.itens {
+    clear: left;
+    width: 37em;
+   margin-left: auto;
+   margin-right: auto;
+    margin-top: 1.5em;
+    border-top: solid;
+    border-bottom: solid;
+    padding-top: 0.5em;
+    padding-left: 5%
+}
+
+div.rodape {
+    width: 55em;
+   margin-left: auto;
+   margin-right: auto;
+    margin-top: 0.5em;
+    text-align: center;
+    font-size: 0.6em;
+}
+
+div.esquerda {
+    margin-top: 1px;
+    margin-bottom: 1em;
+    padding-top: none;
+    border-top: none;
+    width: 80%;
+    float: left;
+}
+
+div.esquerda p {
+    margin-top: 1px;
+}
+
+div.direita {
+    width: 18%;
+    float: right;
+    margin-left: 1%;
+    padding-right: 2px;
+    padding-left: 2px;
+    color: #F0F0F0;
+    background: #202020;
+    text-align: left;
+}
+
+div.direita p {
+    font-weight: 600;
+    padding-left: 0.3em;
+    margin-top: 2px;
+    margin-bottom: 1px;
+}
+
+div.direita ul {
+    background: #C0C0C0;
+    color: black;
+    padding-left: 1em;
+    padding-right: 1em;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+img.left {
+   float: left;
+   margin-right: 1em;
+}
+
+.centralizado {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0px
+}
+
+.legenda {
+    text-align: center;
+    margin-top: 2px;
+    margin-bottom: 2em;
+    font-size: smaller 
+}
+table {
+    border-top-style: solid;
+    border-bottom-style: solid;
+    background-color: #ccc;
+}
+th {
+    padding-left: 1em;
+    padding-right: 1em;
+    border-bottom: thin solid;
+}
+td {
+    text-align: center;
+}
+
+code {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    padding: 0.5em;
+    display: block;
+    white-space: pre;
+    border: solid thin black;
+}
+code .string {
+    font-style: italic;
+    color: #ff04ff }
+code .comentario {
+    color: #0909ff }
+code .especial { /* uma palavra especial (comando, palavra-chave, etc.) */
+    color: #a52a2a }
+
+cite {
+    text-align: right;
+}
+
+dt {
+    font-weight: 600
+}
+
+p.cab { font-size: 0.6em }
+
+p.atualizada { 
+    text-align: right;
+    font-style: italic;
+}
+
+p.mantida { border-top: solid;
+            font-style: italic;
+            padding-top: 0.5em;
+            text-align: right }
+p#mantida { border-top: solid;
+            font-style: italic;
+            padding-top: 0.5em;
+            text-align: right;
+            clear: both }
+
+#disclaim { font-style: italic;
+            text-align: right;
+            padding-left: 5em;
+}
+
+kbd,
+samp,
+.identificador,
+.id,
+.comando {
+    font-family: monospace;
+    color: #3333FF
+}
+
+.teclas kbd {
+    background: #DDD
+}
+
+.riscado {
+    text-decoration: line-through;
+    color: #777
+}
+
+a#tooCool {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    display: block;
+    height: 80px;
+    width: 80px;
+    background: url(bom-demais.png) bottom right no-repeat;
+    text-indent: -999em;
+    text-decoration: none;
+}
