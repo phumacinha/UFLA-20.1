@@ -51,7 +51,6 @@ class PainelDoDesenho : public wxPanel {
         Transformacao mPerspectiva; // A parte da deformacao perspectiva na projecao
         Transformacao mAfastamento; // para afastar o poligono do plano de projecao depois da rotacao
         bool mMapeamentoNaoLinear;
-        int chamados;
 
         wxDECLARE_EVENT_TABLE();
 };

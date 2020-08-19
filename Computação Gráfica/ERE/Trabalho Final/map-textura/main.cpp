@@ -89,8 +89,7 @@ PainelDoDesenho::PainelDoDesenho(wxWindow* ptMae)
       mVertices{ Ponto(-1, 0, 0), Ponto(-1, 1, 0), Ponto(1, 1, 0), Ponto(1, 0, 0) },
       mVetCoordTex{{0,1}, {0,0}, {1,0}, {1,1}},
       mPtMae(dynamic_cast<wxFrame*>(ptMae)),
-      mMapeamentoNaoLinear(true),
-      chamados(0)
+      mMapeamentoNaoLinear(true)
 {
     SetBackgroundColour(*wxBLACK);
     mRotacao.CarregarRotacaoX(M_PI_4);
@@ -105,131 +104,121 @@ void PainelDoDesenho::AlterarRotatacao(int graus) {
 
 // Metodo para desenhar um triangulo com textura
 void PainelDoDesenho::DesenharTriangulo(wxPaintDC* ptDC, Vertice v1, Vertice v2, Vertice v3) {
-    std::cout << endl << "----------" << endl << "CHAMADO " << ++chamados << endl;
-    // O mapeamento de texturas e' feito junto da rasterizacao, por isso este metodo e' ao mesmo
-    // tempo rasterizacao de triangulos e mapeamento de texturas.
-    // Para acessar as coordenadas dos vertices use o atributo publico pos. Ex.: v1.pos.X()
-    // A interface permite implementacao de mapeamento linear e nao-linear. O atributo booleano
-    // mMapeamentoNaoLinear indica se o mapeamento nao linear está selecionado na interface.
-    // Mapeamento nao linear e' a opcao padrao na interface. O enunciado define quais mapeamentos
-    // devem ser implementados.
-    // Para desenhar um pixel, mude a "caneta" usada no DC e depois use o metodo DrawPoint(int,int).
-    double ginvzx, ginvzy, guinvzx, guinvzy, gvinvzx, gvinvzy;
-    double denominador;
-
-    denominador = ((v3.pos.X() - v2.pos.X()) * (v3.pos.Y() - v1.pos.Y()))
-                + ((v2.pos.Y() - v3.pos.Y()) * (v3.pos.X() - v1.pos.X()));
-
-    ginvzx =  ((1/v3.pos.Z() - 1/v2.pos.Z()) * (v3.pos.Y() - v1.pos.Y()) +
-            (v2.pos.Y() - v3.pos.Y()) * (1/v3.pos.Z() - 1/v1.pos.Z()))/denominador;
-
-    ginvzy =  ((1/v2.pos.Z() - 1/v3.pos.Z()) * (v3.pos.X() - v1.pos.X()) +
-            (v3.pos.X() - v2.pos.X()) * (1/v3.pos.Z() - 1/v1.pos.Z()))/denominador;
-
-
-    guinvzx =  ((v3.tex.u/v3.pos.Z() - v2.tex.u/v2.pos.Z()) * (v3.pos.Y() - v1.pos.Y()) +
-            (v2.pos.Y() - v3.pos.Y()) * (v3.tex.u/v3.pos.Z() - v1.tex.u/v1.pos.Z()))/denominador;
-
-    guinvzy =  ((v2.tex.u/v2.pos.Z() - v3.tex.u/v3.pos.Z()) * (v3.pos.X() - v1.pos.X()) +
-            (v3.pos.X() - v2.pos.X()) * (v3.tex.u/v3.pos.Z() - v1.tex.u/v1.pos.Z()))/denominador;
-
-
-    gvinvzx =  ((v3.tex.v/v3.pos.Z() - v2.tex.v/v2.pos.Z()) * (v3.pos.Y() - v1.pos.Y()) +
-            (v2.pos.Y() - v3.pos.Y()) * (v3.tex.v/v3.pos.Z() - v1.tex.v/v1.pos.Z()))/denominador;
-
-    gvinvzy =  ((v2.tex.v/v2.pos.Z() - v3.tex.v/v3.pos.Z()) * (v3.pos.X() - v1.pos.X()) +
-            (v3.pos.X() - v2.pos.X()) * (v3.tex.v/v3.pos.Z() - v1.tex.v/v1.pos.Z()))/denominador;
-
-    Aresta arestas[3] = {{v1, v2}, {v2, v3}, {v3, v1}};
-      
-    double maiorComprimento = 0;
-    int arestaLonga = 0;
-
-    for (int i = 0; i < 3; i++) {
-        double comprimento = arestas[i].Y2() - arestas[i].Y1();
-        if (comprimento > maiorComprimento) {
-            maiorComprimento = comprimento;
-            arestaLonga = i;
-        }
-    }
-
-    for (int i = 1; i < 3; i++) {
-        int arestaCurta = (arestaLonga + i) % 3;
-
-        /*
-        Vertice vYmin = arestas[arestaCurta].Y1() < arestas[arestaCurta].Y2() ? arestas[arestaCurta].V1 : arestas[arestaCurta].V2;
-        double ymin = vYmin.pos.Y();
-        double ymax = max(arestas[arestaCurta].Y1(), arestas[arestaCurta].Y2());
-        double xesq = min(arestas[arestaCurta].X1(), )*/
-
-        
-
-        double longaYdif = arestas[arestaLonga].Ydif();
-        if (longaYdif == 0.0) {
-            continue;
-        }
-
-        double curtaYdif = arestas[arestaCurta].Ydif();
-        if (curtaYdif == 0.0)
-            continue;
-
-        double longaXdif = arestas[arestaLonga].Xdif();
-        double curtaXdif = arestas[arestaCurta].Xdif();
-
-        double ymin = arestas[arestaCurta].Y1();
-        double ymax = arestas[arestaCurta].Y2();
-
-        bool longaEstaAesquerda = arestas[arestaLonga] < arestas[arestaCurta];
-        int arestaEsq = (longaEstaAesquerda) ? arestaLonga : arestaCurta;
-        int arestaDir = (longaEstaAesquerda) ? arestaCurta : arestaLonga;
-
-        std::cout << arestaEsq << " " << arestaDir << endl;
-
-        double xesq = arestas[arestaEsq].XdeY((double) arestas[arestaCurta].Y1());
-        double xdir = arestas[arestaDir].XdeY((double) arestas[arestaCurta].Y1());
-
-        double incxesq = arestas[arestaEsq].Xdif()/arestas[arestaEsq].Ydif();
-        double incxdir = arestas[arestaDir].Xdif()/arestas[arestaDir].Ydif();
-
-
-        double invz = (double)(1 / arestas[arestaEsq].ZdeY(ymin));
-        double uinvz = (double)(arestas[arestaEsq].UdeY(ymin) * invz);
-        double vinvz = (double)(arestas[arestaEsq].VdeY(ymin) * invz);
-
-        wxPen pen(*wxBLUE_PEN);
-
-        for (double y = ymin; y < ymax; y++) {
-
-            for (double x = xesq; x < xdir; x++) {
-                double difx = x - xesq;
-                double u = (uinvz + difx*guinvzx)/(invz + difx*ginvzx);
-                double v = (vinvz + difx*gvinvzx)/(invz + difx*ginvzx);
-                pen.SetColour(mPtTextura->ColourAt(u, v));
-                ptDC->SetPen(pen);
-                ptDC->DrawPoint(x, y);
-
-                /*
-                uinvz += guinvzx;
-                vinvz += gvinvzx;
-                invz += ginvzx;
-                */
-            }
-            xesq += incxesq;
-            xdir += incxdir;
-
-            uinvz += guinvzx*incxesq + guinvzy;
-            vinvz += gvinvzx*incxesq + gvinvzy;
-            invz += ginvzx*incxesq + ginvzy;
-        }
-    }
-
-     // caneta local para escolher a cor do pixel
-    // Ex.:
-    // pen.SetColour(mPtTextura->ColourAt(uinvz/invz, vinvz/invz)); // selecionar cor pela textura
-    // ptDC->SetPen(pen); // mudar a cor corrente
+    if (mMapeamentoNaoLinear) {
     
-    //ptDC->DrawPoint(x, y); // desenhar com a cor corrente
-    #warning PainelDoDesenho::DesenharTriangulo não foi implementado.
+        // Variaveis de gradiente
+        double ginvzx, ginvzy, guinvzx, guinvzy, gvinvzx, gvinvzy;
+        // Denominador do calculo de gradientes
+        double denominador;
+
+        denominador = ((v3.pos.X() - v2.pos.X()) * (v3.pos.Y() - v1.pos.Y()))
+                    + ((v2.pos.Y() - v3.pos.Y()) * (v3.pos.X() - v1.pos.X()));
+
+        // d(1/z)/dx
+        ginvzx =  ((1/v3.pos.Z() - 1/v2.pos.Z()) * (v3.pos.Y() - v1.pos.Y()) +
+                (v2.pos.Y() - v3.pos.Y()) * (1/v3.pos.Z() - 1/v1.pos.Z()))/denominador;
+
+        // d(1/z)/dy
+        ginvzy =  ((1/v2.pos.Z() - 1/v3.pos.Z()) * (v3.pos.X() - v1.pos.X()) +
+                (v3.pos.X() - v2.pos.X()) * (1/v3.pos.Z() - 1/v1.pos.Z()))/denominador;
+
+        // d(u/z)/dx
+        guinvzx =  ((v3.tex.u/v3.pos.Z() - v2.tex.u/v2.pos.Z()) * (v3.pos.Y() - v1.pos.Y()) +
+                (v2.pos.Y() - v3.pos.Y()) * (v3.tex.u/v3.pos.Z() - v1.tex.u/v1.pos.Z()))/denominador;
+
+        // d(u/z)/dy
+        guinvzy =  ((v2.tex.u/v2.pos.Z() - v3.tex.u/v3.pos.Z()) * (v3.pos.X() - v1.pos.X()) +
+                (v3.pos.X() - v2.pos.X()) * (v3.tex.u/v3.pos.Z() - v1.tex.u/v1.pos.Z()))/denominador;
+
+        // d(v/z)/dx
+        gvinvzx =  ((v3.tex.v/v3.pos.Z() - v2.tex.v/v2.pos.Z()) * (v3.pos.Y() - v1.pos.Y()) +
+                (v2.pos.Y() - v3.pos.Y()) * (v3.tex.v/v3.pos.Z() - v1.tex.v/v1.pos.Z()))/denominador;
+
+        // d(v/z)/dy
+        gvinvzy =  ((v2.tex.v/v2.pos.Z() - v3.tex.v/v3.pos.Z()) * (v3.pos.X() - v1.pos.X()) +
+                (v3.pos.X() - v2.pos.X()) * (v3.tex.v/v3.pos.Z() - v1.tex.v/v1.pos.Z()))/denominador;
+
+        // Instancia arestas
+        Aresta arestas[3] = {{v1, v2}, {v2, v3}, {v3, v1}};
+        
+        double maiorVariacao = 0;
+        int idArestaLonga = 0;
+
+        // Verifica qual é a aresta longa (aquela que possui maior variacao no eixo Y)
+        for (int i = 0; i < 3; i++) {
+            double variacao = arestas[i].Y2() - arestas[i].Y1();
+            if (variacao > maiorVariacao) {
+                maiorVariacao = variacao;
+                idArestaLonga = i;
+            }
+        }
+
+        // Ponteiro para a aresta longa
+        Aresta *arestaLonga = &arestas[idArestaLonga];
+
+        // Desenha as duas metades do triangulo.
+        for (int i = 1; i < 3; i++) {
+            Aresta *arestaCurta = &arestas[(idArestaLonga + i) % 3];
+
+            // Verifica se alguma das arestas e' paralela ao eixo X.
+            if (arestaLonga->Ydif() == 0 || arestaCurta->Ydif() == 0)
+                continue;
+
+            // Como a classe Aresta define o vertice 1 como o vertice de menor Y,
+            // e' facil calcular ymin e ymax. 
+            double ymin = arestaCurta->Y1();
+            double ymax = arestaCurta->Y2();
+            
+            // Ponteiros para a aresta 'a esquerda e 'a direita.
+            bool longaEstaAesquerda = *arestaLonga < *arestaCurta;
+            Aresta *arestaEsq = (longaEstaAesquerda) ? arestaLonga : arestaCurta;
+            Aresta *arestaDir = (longaEstaAesquerda) ? arestaCurta : arestaLonga;
+
+            // Calcula xesq e xdir baseado no ymin.
+            double xesq = arestaEsq->XdeY(ymin);
+            double xdir = arestaDir->XdeY(ymin);
+
+            // Calcula o incremento da aresta esqueda e da direita.
+            double incxesq = arestaEsq->Xdif()/arestaEsq->Ydif();
+            double incxdir = arestaDir->Xdif()/arestaDir->Ydif();
+
+            // Calcula caracteristicas a partir do menor y.
+            double invz = (double)(1 / arestaEsq->ZdeY(ymin));
+            double uinvz = (double)(arestaEsq->UdeY(ymin) * invz);
+            double vinvz = (double)(arestaEsq->VdeY(ymin) * invz);
+
+            wxPen pen(*wxBLUE_PEN);
+
+            // Percorre todas as linhas, de baixo pra cima.
+            for (int y = ymin; y <= ymax; y++) {
+                
+                // Percorre toda a linha de xesq ate' xdir na altura y desenhando cada pixel.
+                for (int x = xesq; x <= xdir; x++) {
+                    double difx = x - xesq;
+                    double u = (uinvz + difx*guinvzx)/(invz + difx*ginvzx);
+                    double v = (vinvz + difx*gvinvzx)/(invz + difx*ginvzx);
+
+                    // Verifica se as coordenadas de textura sao validas.
+                    // Se nao, parte para a proxima iteracao.
+                    if (u < 0 || u > 1 || v < 0 || v > 1)
+                        continue;
+
+                    pen.SetColour(mPtTextura->ColourAt(u, v));
+                    ptDC->SetPen(pen);
+                    ptDC->DrawPoint(x, y);
+                }
+
+                // Incrementa xesq e xdir
+                xesq += incxesq;
+                xdir += incxdir;
+
+                // Incrementa os gradientes.
+                uinvz += guinvzx*incxesq + guinvzy;
+                vinvz += gvinvzx*incxesq + gvinvzy;
+                invz += ginvzx*incxesq + ginvzy;
+            }
+        }
+    }
 }
 
 void PainelDoDesenho::OnPaint(wxPaintEvent& event) {
