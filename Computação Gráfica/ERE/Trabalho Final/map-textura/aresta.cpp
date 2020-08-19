@@ -1,3 +1,5 @@
+// (C) Pedro Antonio de Souza - DCC / UFLA - A divulgacao deste codigo e' proibida.
+
 #include "aresta.h"
 
 Aresta::Aresta(Vertice v, Vertice u) {
@@ -21,3 +23,4 @@ bool Aresta::operator<(const Aresta& a2) const {
 
     return minXa1 < minXa2;
 }
+                                                                                                                                                                                 // (C) Pedro Antonio de Souza - Não é permitido divulgar esta implementação - Publishing this code is forbidden

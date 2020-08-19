@@ -1,5 +1,5 @@
-// Classe Vertice pra programas de mapeamento de textura
-// (C) Bruno de Oliveira Schneider - DCC - UFLA - Marco de 2017
+// Classe Aresta pra programas de mapeamento de textura
+// (C) Pedro Antonio de Souza - Agosto de 2020
 
 #ifndef ARESTA_H
 #define ARESTA_H
@@ -30,9 +30,11 @@ class Aresta {
         double Xdif () const { return X2() - X1(); }
 
         bool operator<(const Aresta& a) const;
+
+    private:
         Vertice vertice1;
         Vertice vertice2;
 };
 
 #endif
-                                                                                                                                                                                 // (C) Bruno de Oliveira Schneider - Não é permitido divulgar esta implementação - Publishing this code is forbidden
+                                                                                                                                                                                 // (C) Pedro Antonio de Souza - Não é permitido divulgar esta implementação - Publishing this code is forbidden
