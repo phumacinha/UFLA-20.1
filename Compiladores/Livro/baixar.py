@@ -4,7 +4,7 @@ from selenium import webdriver
 from PIL import Image
 from io import BytesIO
 
-driver = webdriver.Chrome('./chromedriver')  # Optional argument, if not specified will search path.
+driver = webdriver.Chrome('chromedriver.exe')  # Optional argument, if not specified will search path.
 driver.get('https://plataforma.bvirtual.com.br/Leitor/Publicacao/280/pdf/0?code=86BZaiplTZKykQZjnXO15vo8BTw58DI5RY6RRL5cHVGbbRHja3VEYnTwLDg0/D8tQ5iEJuWPZHIjaCIfSpafuw==');
 continuar = input("Pressione enter para fazer login.")
 driver.find_element_by_id('UserName').send_keys('11587306670')
@@ -14,7 +14,7 @@ driver.find_element_by_id('Password').submit()
 continuar = input("Pressione enter para salvar.")
 time.sleep(3)
 imageList = list()
-for i in range(228, 274):
+for i in range(321, 368):
     print('Imagem {}...'.format(i))
     canvas = driver.find_element_by_id('page-canvas')
     # get the canvas as a PNG base64 string
@@ -38,4 +38,4 @@ for i in range(228, 274):
 
 print('-----\nSalvando PDF...')
 im1 = imageList.pop(0)
-im1.save('Livro.pdf', save_all=True, append_images=imageList)
+im1.save('Capítulo 8.pdf', save_all=True, append_images=imageList)
