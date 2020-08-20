@@ -336,6 +336,7 @@ Janela::Janela(bool stereoWindow)
     menu->Append(wxID_OPEN, "Abrir &Textura\tCtrl-T");
     menu->AppendCheckItem(ID_MAP_NAO_LINEAR, wxT("Mapeamento não &linear\tCtrl-L"),
                           wxT("Liga ou desliga o mapeamento não linear."));
+    menu->Check(ID_MAP_NAO_LINEAR, true); // Linha adicionada ja que por padrao o programa faz mapeamento nao linear.
     menu->AppendSeparator();
     menu->Append(wxID_CLOSE, wxT("&Encerrar\tCtrl-Q"));
     wxMenuBar *menuBar = new wxMenuBar;
