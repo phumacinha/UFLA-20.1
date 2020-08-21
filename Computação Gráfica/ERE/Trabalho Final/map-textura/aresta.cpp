@@ -14,13 +14,12 @@ Aresta::Aresta(Vertice v, Vertice u) {
         
 }
 
+// Sobre carga do operador < para verificar se uma aresta
+// esta' a esquerda de outra aresta.
 bool Aresta::operator<(const Aresta& a2) const {
-    double minXa1 = std::min(X1(), X2());
-    double minXa2 = std::min(a2.X1(), a2.X2());
-    
-    if (minXa1 == minXa2)
-        return std::max(X1(), X2()) < std::max(a2.X1(), a2.X2());
-
-    return minXa1 < minXa2;
+    if (X1() == a2.X2() && Y1() == a2.Y1())
+        return XdeY(Y1() + 1) < a2.XdeY(Y1() + 1);
+    else
+        return XdeY(Y2() - 1) < a2.XdeY(Y2() - 1);
 }
                                                                                                                                                                                  // (C) Pedro Antonio de Souza - Não é permitido divulgar esta implementação - Publishing this code is forbidden
