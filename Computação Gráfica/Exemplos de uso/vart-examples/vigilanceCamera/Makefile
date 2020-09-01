@@ -12,7 +12,7 @@ LDLIBS = -lGL -lglut -lGLU -lIL
 
 OBJECTS =  color.o sgpath.o snlocator.o scenenode.o\
 scene.o texture.o material.o\
-boundingbox.o memoryobj.o graphicobj.o cylinder.o light.o\
+box.o boundingbox.o memoryobj.o graphicobj.o cylinder.o light.o\
 picknamelocator.o mesh.o meshobject.o point4d.o curve.o bezier.o\
 transform.o sphere.o camera.o mousecontrol.o file.o\
 modifier.o dof.o joint.o biaxialjoint.o viewerglutogl.o\
